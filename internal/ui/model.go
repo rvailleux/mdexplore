@@ -3,6 +3,7 @@ package ui
 import (
 	tea "github.com/charmbracelet/bubbletea"
 	"mdexplore/internal/models"
+	"mdexplore/internal/renderer"
 )
 
 // ViewMode represents the current display mode.
@@ -12,6 +13,14 @@ const (
 	ViewTOC ViewMode = iota      // Table of contents navigation view
 	ViewContent                  // Section content display view
 )
+
+// glamourRenderer wraps the renderer package function for use in the UI.
+type glamourRenderer struct{}
+
+// Render implements the renderer.Renderer interface.
+func (r *glamourRenderer) Render(markdown string, width int) (string, error) {
+	return renderer.RenderMarkdown(markdown, width)
+}
 
 // Model represents the state of the TUI application.
 type Model struct {
@@ -26,6 +35,7 @@ type Model struct {
 	ExpandedSections map[string]bool  // Set of expanded section IDs
 	CurrentSection   *models.Section  // Section being viewed (in content mode)
 	ReturnIndex      int              // Position to restore when returning from content view
+	markdownRenderer renderer.Renderer // Markdown renderer for content display
 }
 
 // InitialModel creates a new model with the given filename and section tree.
@@ -38,6 +48,7 @@ func InitialModel(filename string, tree *models.SectionTree) Model {
 		Quitting:         false,
 		ViewMode:         ViewTOC,
 		ExpandedSections: make(map[string]bool),
+		markdownRenderer: &glamourRenderer{},
 	}
 }
 
@@ -52,6 +63,7 @@ func InitialModelWithSelection(filename string, tree *models.SectionTree, target
 		ViewMode:         ViewContent, // Start in content view
 		ExpandedSections: make(map[string]bool),
 		CurrentSection:   targetSection,
+		markdownRenderer: &glamourRenderer{},
 	}
 
 	// Expand all parent sections to make target visible

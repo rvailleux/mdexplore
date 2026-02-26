@@ -15,6 +15,8 @@ import (
 
 var (
 	version       = "dev"
+	buildTime     = "unknown"
+	commit        = "unknown"
 	showToc       bool
 	showHelp      bool
 	showVer       bool
@@ -52,7 +54,7 @@ Options:
 			}
 			return nil
 		},
-		Version: version,
+		Version: fmt.Sprintf("%s (commit: %s, built: %s)", version, commit, buildTime),
 		RunE:    run,
 	}
 

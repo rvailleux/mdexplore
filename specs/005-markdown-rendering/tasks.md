@@ -19,9 +19,9 @@
 
 **Purpose**: Add Glamour library dependency
 
-- [ ] T001 Add `github.com/charmbracelet/glamour` to go.mod in project root
-- [ ] T002 [P] Run `go mod tidy` to download dependencies
-- [ ] T003 [P] Verify build succeeds: `go build ./cmd/mdexplore`
+- [X] T001 Add `github.com/charmbracelet/glamour` to go.mod in project root
+- [X] T002 [P] Run `go mod tidy` to download dependencies
+- [X] T003 [P] Verify build succeeds: `go build ./cmd/mdexplore`
 
 **Checkpoint**: Glamour library available for use
 
@@ -33,12 +33,12 @@
 
 **⚠️ CRITICAL**: Must complete before user story implementation
 
-- [ ] T004 Create `internal/renderer/` directory
-- [ ] T005 Define `Renderer` interface in `internal/renderer/renderer.go`
-- [ ] T006 Implement `GlamourRenderer` struct in `internal/renderer/glamour.go`
-- [ ] T007 Add `NewGlamourRenderer(style string)` constructor
-- [ ] T008 Implement `Render(markdown string, width int)` method
-- [ ] T009 Add tests for renderer in `tests/unit/renderer_test.go`
+- [X] T004 Create `internal/renderer/` directory
+- [X] T005 Define `Renderer` interface in `internal/renderer/renderer.go`
+- [X] T006 Implement `GlamourRenderer` struct in `internal/renderer/glamour.go`
+- [X] T007 Add `NewGlamourRenderer(style string)` constructor
+- [X] T008 Implement `Render(markdown string, width int)` method
+- [X] T009 Add tests for renderer in `tests/unit/renderer_test.go`
 
 **Checkpoint**: Renderer package ready - can render markdown to styled text
 
@@ -52,12 +52,12 @@
 
 ### Tests for User Story 1
 
-- [ ] T010 [P] [US1] Add test for H1-H6 rendering in `tests/unit/renderer_test.go`
+- [X] T010 [P] [US1] Add test for H1-H6 rendering in `tests/unit/renderer_test.go`
 
 ### Implementation for User Story 1
 
-- [ ] T011 [US1] Verify Glamour renders headings with default "dark" theme
-- [ ] T012 [US1] Test heading hierarchy in terminal output
+- [X] T011 [US1] Verify Glamour renders headings with default "dark" theme
+- [X] T012 [US1] Test heading hierarchy in terminal output
 
 **Checkpoint**: Headings display with visual hierarchy
 
@@ -71,15 +71,15 @@
 
 ### Tests for User Story 2
 
-- [ ] T013 [P] [US2] Add test for unordered list rendering in `tests/unit/renderer_test.go`
-- [ ] T014 [P] [US2] Add test for ordered list rendering in `tests/unit/renderer_test.go`
+- [X] T013 [P] [US2] Add test for unordered list rendering in `tests/unit/renderer_test.go`
+- [X] T014 [P] [US2] Add test for ordered list rendering in `tests/unit/renderer_test.go`
 
 ### Implementation for User Story 2
 
-- [ ] T015 [US2] Verify Glamour renders unordered lists with bullets
-- [ ] T016 [US2] Verify Glamour renders ordered lists with numbers
-- [ ] T017 [US2] Test nested list indentation
-- [ ] T018 [US2] Test task list (- [ ], - [x]) rendering
+- [X] T015 [US2] Verify Glamour renders unordered lists with bullets
+- [X] T016 [US2] Verify Glamour renders ordered lists with numbers
+- [X] T017 [US2] Test nested list indentation
+- [X] T018 [US2] Test task list (- [ ], - [x]) rendering
 
 **Checkpoint**: All list types render correctly
 
@@ -93,14 +93,14 @@
 
 ### Tests for User Story 3
 
-- [ ] T019 [P] [US3] Add test for fenced code block rendering in `tests/unit/renderer_test.go`
-- [ ] T020 [P] [US3] Add test for inline code rendering in `tests/unit/renderer_test.go`
+- [X] T019 [P] [US3] Add test for fenced code block rendering in `tests/unit/renderer_test.go`
+- [X] T020 [P] [US3] Add test for inline code rendering in `tests/unit/renderer_test.go`
 
 ### Implementation for User Story 3
 
-- [ ] T021 [US3] Verify Glamour renders code blocks with background
-- [ ] T022 [US3] Test syntax highlighting for common languages (Go, Python, JavaScript)
-- [ ] T023 [US3] Verify inline code has distinct styling
+- [X] T021 [US3] Verify Glamour renders code blocks with background
+- [X] T022 [US3] Test syntax highlighting for common languages (Go, Python, JavaScript)
+- [X] T023 [US3] Verify inline code has distinct styling
 
 **Checkpoint**: Code blocks have visual separation and syntax highlighting
 
@@ -114,15 +114,15 @@
 
 ### Tests for User Story 4
 
-- [ ] T024 [P] [US4] Add test for bold text rendering in `tests/unit/renderer_test.go`
-- [ ] T025 [P] [US4] Add test for italic text rendering in `tests/unit/renderer_test.go`
-- [ ] T026 [P] [US4] Add test for strikethrough rendering in `tests/unit/renderer_test.go`
+- [X] T024 [P] [US4] Add test for bold text rendering in `tests/unit/renderer_test.go`
+- [X] T025 [P] [US4] Add test for italic text rendering in `tests/unit/renderer_test.go`
+- [X] T026 [P] [US4] Add test for strikethrough rendering in `tests/unit/renderer_test.go`
 
 ### Implementation for User Story 4
 
-- [ ] T027 [US4] Verify Glamour renders **bold** text
-- [ ] T028 [US4] Verify Glamour renders *italic* text
-- [ ] T029 [US4] Verify Glamour renders ~~strikethrough~~ text
+- [X] T027 [US4] Verify Glamour renders **bold** text
+- [X] T028 [US4] Verify Glamour renders *italic* text
+- [X] T029 [US4] Verify Glamour renders ~~strikethrough~~ text
 
 **Checkpoint**: Text formatting styles render correctly
 
@@ -136,12 +136,12 @@
 
 ### Tests for User Story 5
 
-- [ ] T030 [P] [US5] Add test for link rendering in `tests/unit/renderer_test.go`
+- [X] T030 [P] [US5] Add test for link rendering in `tests/unit/renderer_test.go`
 
 ### Implementation for User Story 5
 
-- [ ] T031 [US5] Verify Glamour renders links with underlining
-- [ ] T032 [US5] Verify bare URLs are styled as links
+- [X] T031 [US5] Verify Glamour renders links with underlining
+- [X] T032 [US5] Verify bare URLs are styled as links
 
 **Checkpoint**: Links are visually distinct
 
@@ -155,13 +155,13 @@
 
 ### Tests for User Story 6
 
-- [ ] T033 [P] [US6] Add test for blockquote rendering in `tests/unit/renderer_test.go`
-- [ ] T034 [P] [US6] Add test for horizontal rule rendering in `tests/unit/renderer_test.go`
+- [X] T033 [P] [US6] Add test for blockquote rendering in `tests/unit/renderer_test.go`
+- [X] T034 [P] [US6] Add test for horizontal rule rendering in `tests/unit/renderer_test.go`
 
 ### Implementation for User Story 6
 
-- [ ] T035 [US6] Verify Glamour renders blockquotes with left border
-- [ ] T036 [US6] Verify Glamour renders horizontal rules as line separators
+- [X] T035 [US6] Verify Glamour renders blockquotes with left border
+- [X] T036 [US6] Verify Glamour renders horizontal rules as line separators
 
 **Checkpoint**: Blockquotes and rules visually distinct
 
@@ -175,12 +175,12 @@
 
 ### Tests for User Story 7
 
-- [ ] T037 [P] [US7] Add test for table rendering in `tests/unit/renderer_test.go`
+- [X] T037 [P] [US7] Add test for table rendering in `tests/unit/renderer_test.go`
 
 ### Implementation for User Story 7
 
-- [ ] T038 [US7] Verify Glamour renders tables with aligned columns
-- [ ] T039 [US7] Verify table headers are visually distinguished
+- [X] T038 [US7] Verify Glamour renders tables with aligned columns
+- [X] T039 [US7] Verify table headers are visually distinguished
 
 **Checkpoint**: Tables render with proper formatting
 
@@ -190,11 +190,11 @@
 
 **Purpose**: Integrate renderer with TUI content view
 
-- [ ] T040 Add `renderer` field to Model in `internal/ui/model.go`
-- [ ] T041 Initialize renderer in `InitialModel()` function
-- [ ] T042 Modify `renderContent()` in `internal/ui/view.go` to use renderer
-- [ ] T043 Pass terminal width to renderer for proper wrapping
-- [ ] T044 Handle renderer errors gracefully (fallback to plain text)
+- [X] T040 Add `renderer` field to Model in `internal/ui/model.go`
+- [X] T041 Initialize renderer in `InitialModel()` function
+- [X] T042 Modify `renderContent()` in `internal/ui/view.go` to use renderer
+- [X] T043 Pass terminal width to renderer for proper wrapping
+- [X] T044 Handle renderer errors gracefully (fallback to plain text)
 
 **Checkpoint**: TUI displays rendered markdown in content view
 
@@ -204,11 +204,11 @@
 
 **Purpose**: Final improvements and documentation
 
-- [ ] T045 [P] Update README.md with markdown rendering features
-- [ ] T046 Run `go test ./...` and verify all tests pass
-- [ ] T047 Run `golangci-lint run` and fix any issues
-- [ ] T048 Manual test in terminal with various markdown files
-- [ ] T049 Verify performance under 100ms for typical sections
+- [X] T045 [P] Update README.md with markdown rendering features
+- [X] T046 Run `go test ./...` and verify all tests pass
+- [X] T047 Run `golangci-lint run` and fix any issues
+- [X] T048 Manual test in terminal with various markdown files
+- [X] T049 Verify performance under 100ms for typical sections
 
 ---
 

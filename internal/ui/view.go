@@ -10,6 +10,11 @@ import (
 	"mdexplore/internal/models"
 )
 
+// Renderer interface for markdown rendering.
+type Renderer interface {
+	Render(markdown string, width int) (string, error)
+}
+
 // Styles for the TUI
 var (
 	titleStyle = lipgloss.NewStyle().
@@ -46,7 +51,7 @@ var (
 		Italic(true)
 
 	contentStyle = lipgloss.NewStyle().
-		Padding(1, 2)
+		PaddingLeft(1)
 )
 
 // View renders the TUI based on the current model state.
@@ -180,7 +185,28 @@ func (m Model) renderContent() string {
 			content = extracted
 		}
 	}
-	b.WriteString(contentStyle.Render(content))
+
+	// Render markdown with Glamour
+	var renderedContent string
+	if m.markdownRenderer != nil {
+		// Calculate available width for content (account for padding)
+		contentWidth := m.Width - 4
+		if contentWidth < 40 {
+			contentWidth = 80 // Default minimum width
+		}
+		if rendered, err := m.markdownRenderer.Render(content, contentWidth); err == nil {
+			renderedContent = rendered
+		} else {
+			// Fallback to plain text on error
+			renderedContent = content
+		}
+	} else {
+		// No renderer available, use plain text
+		renderedContent = content
+	}
+
+	// Apply minimal padding to the rendered content
+	b.WriteString(contentStyle.Render(renderedContent))
 
 	b.WriteString("\n\n")
 	b.WriteString(helpStyle.Render("[Esc] Return to navigation  [q] Quit"))

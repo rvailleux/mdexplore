@@ -31,6 +31,7 @@ A CLI tool that displays a hierarchical table of contents from markdown files us
 - **Hierarchical Numbering**: Sections are numbered (1., 1.1, 1.1.1) for easy reference
 - **Pre-select Sections**: Use `--select` flag to jump directly to a specific section
 - **Hierarchical Navigation**: Expand/collapse sections to focus on specific parts of your document
+- **Rich Markdown Rendering**: Beautifully formatted content view with styled headings, lists, code blocks, and more
 - **Content View**: View section content directly in the terminal without leaving the tool
 - **Depth Limiting**: Use `--level` flag to limit TOC depth (e.g., show only H1 and H2)
 - **Multiple Heading Formats**: Supports both ATX (`# Heading`) and Setext (`Heading\n===`) style headings
@@ -119,13 +120,23 @@ When the TUI is open:
 ```
 
 ### Content View
+
+Content is beautifully rendered with rich markdown formatting:
+
 ```
 📄 README.md - L5-8: Installation
 
-  ## Installation
-
-  To install mdexplore, run:
-  go install ./cmd/mdexplore
+  ┌─────────────────────────────────────────────────────────────┐
+  │  Installation                                               │
+  │                                                             │
+  │  To install mdexplore, run:                                 │
+  │                                                             │
+  │    go install ./cmd/mdexplore                               │
+  │                                                             │
+  │  • Bullet points are styled                                 │
+  │  • Code blocks have syntax highlighting                     │
+  │  • Links are underlined                                     │
+  └─────────────────────────────────────────────────────────────┘
 
 [Esc] Return to navigation  [q] Quit
 ```
