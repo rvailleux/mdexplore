@@ -1,3 +1,4 @@
+// Package renderer provides markdown to terminal rendering capabilities.
 package renderer
 
 import (
@@ -7,6 +8,18 @@ import (
 	"github.com/charmbracelet/glamour"
 	"github.com/charmbracelet/lipgloss"
 )
+
+// Renderer converts markdown to styled terminal output.
+type Renderer interface {
+	// Render converts markdown text to terminal-ready styled text.
+	Render(markdown string, width int) (string, error)
+}
+
+// WriteTestFile is a helper for tests to write content to a file.
+// It is exported for use in test packages.
+func WriteTestFile(filepath string, content string) error {
+	return os.WriteFile(filepath, []byte(content), 0644)
+}
 
 // RenderMarkdown renders markdown content as styled terminal output.
 func RenderMarkdown(content string, width int) (string, error) {
