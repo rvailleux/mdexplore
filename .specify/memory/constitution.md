@@ -123,6 +123,7 @@ Keep the codebase and user interface simple:
 
 ### Code Quality Gates
 
+- **Lint Check**: ALL lint checks MUST pass before pushing (`golangci-lint run`)
 - All tests MUST pass before merging
 - New features MUST include tests (per TDD)
 - TUI changes SHOULD be manually tested in common terminals
@@ -165,4 +166,4 @@ This constitution supersedes all other development practices. Any conflict betwe
 
 ---
 
-**Version**: 1.0.1 | **Ratified**: 2025-02-25 | **Last Amended**: 2026-02-25
+**Version**: 1.0.2 | **Ratified**: 2025-02-25 | **Last Amended**: 2026-02-26
