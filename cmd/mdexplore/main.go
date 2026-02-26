@@ -70,7 +70,7 @@ Options:
 func run(cmd *cobra.Command, args []string) error {
 	// Check if file argument provided
 	if len(args) == 0 {
-		cmd.Usage()
+		_ = cmd.Usage()
 		return nil
 	}
 
@@ -187,19 +187,6 @@ func printSelectedSection(tree *models.SectionTree, target *models.Section) {
 			indent := strings.Repeat("  ", ns.Section.GetDepth()-target.GetDepth())
 			fmt.Printf("%-6s L%d-%d %s%s\n", ns.DisplayNumber, ns.Section.StartLine, ns.Section.EndLine, indent, ns.Section.Title)
 		}
-	}
-}
-
-// printTOC prints the table of contents to stdout in non-TTY mode (legacy)
-func printTOC(toc models.TableOfContents) {
-	if toc.IsEmpty() {
-		fmt.Println("No headings found.")
-		return
-	}
-
-	for _, heading := range toc.Headings {
-		indent := strings.Repeat("  ", heading.Level-1)
-		fmt.Printf("%s%s\n", indent, heading.Text)
 	}
 }
 
