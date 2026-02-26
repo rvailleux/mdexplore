@@ -1,19 +1,11 @@
 <!--
 ================================================================================
-SYNC IMPACT REPORT - Constitution v1.0.0
+SYNC IMPACT REPORT - Constitution v1.0.1
 ================================================================================
-Version Change: N/A (initial creation) → 1.0.0
-Modified Principles: All new (initial creation)
-  - Principle I: Test-Driven Development (NEW)
-  - Principle II: Terminal User Interface (NEW)
-  - Principle III: Markdown Reader Focus (NEW)
-  - Principle IV: Agent-First Design (NEW)
-  - Principle V: Simplicity (NEW)
-Added Sections:
-  - Core Principles (all 5 principles)
-  - Technology Standards
-  - Development Workflow
-  - Governance
+Version Change: 1.0.0 → 1.0.1
+Modified Principles:
+  - Principle IV: Agent-First Design (UPDATED - clarified mdexplore is for coding agents)
+Added Sections: None
 Removed Sections: None
 Templates Requiring Updates:
   - ✅ .specify/templates/plan-template.md - Constitution Check section reviewed
@@ -63,9 +55,9 @@ The project exists solely to render and navigate Markdown documents for coding a
 
 **Rationale**: Scope clarity prevents feature creep. By focusing exclusively on reading (not editing) markdown, we deliver a superior experience for our target users—coding agents reviewing documentation and specifications.
 
-### IV. Agent-First Design
+### IV. Agent-First Design (mdexplore is for Coding Agents)
 
-All design decisions prioritize the coding agent workflow:
+**mdexplore is primarily designed for coding agents.** All design decisions prioritize the coding agent workflow:
 
 - **Spec Reading**: Optimize for reading technical specifications and implementation plans
 - **Documentation Navigation**: Easy traversal of project documentation structures
@@ -73,7 +65,7 @@ All design decisions prioritize the coding agent workflow:
 - **Integration-Friendly**: Work well when invoked by scripts and automation
 - **Clear Output**: Structured output suitable for parsing when needed
 
-**Rationale**: Coding agents (both AI and human) have specific needs: quick access to information, clear formatting of technical content, and minimal friction. Design choices must serve this audience over general-purpose markdown viewers.
+**Rationale**: Coding agents (both AI and human) have specific needs: quick access to information, clear formatting of technical content, and minimal friction. Design choices must serve this audience over general-purpose markdown viewers. The tool is built for agents who need to rapidly consume technical documentation.
 
 ### V. Simplicity
 
@@ -91,26 +83,31 @@ Keep the codebase and user interface simple:
 
 ### Language & Runtime
 
-- **Primary Language**: To be determined based on TUI library ecosystem
+- **Primary Language**: Go 1.23+ (Bubble Tea TUI ecosystem)
 - **Target Platforms**: Linux, macOS, Windows (terminal environments)
 - **Minimum Requirements**: Modern terminal with UTF-8 and color support
 
 ### Dependencies
 
-- **TUI Library**: Required—plain console I/O is insufficient
-- **Markdown Parser**: Required—must support CommonMark and common extensions
+- **TUI Library**: Required—Bubble Tea for Go
+- **Markdown Parser**: Required—Goldmark for CommonMark support
 - **Syntax Highlighter**: Required—for code block rendering
-- **Testing Framework**: Required—aligned with TDD principle
+- **Testing Framework**: Required—Go's standard testing package
 
 ### Project Structure
 
 ```
-├── src/              # Source code
-├── tests/            # Test files (mirror src structure)
+├── cmd/              # CLI entry points
+├── internal/         # Internal packages
+│   ├── ui/           # TUI components
+│   ├── parser/       # Markdown parsing
+│   ├── models/       # Data models
+│   └── errors/       # Error types
+├── tests/            # Test files
 │   ├── unit/         # Unit tests (TDD: written first)
-│   └── integration/  # Integration tests
-├── docs/             # Documentation
-└── cmd/              # CLI entry points (if applicable)
+│   ├── integration/  # Integration tests
+│   └── benchmark/    # Performance tests
+└── docs/             # Documentation
 ```
 
 ## Development Workflow
@@ -168,4 +165,4 @@ This constitution supersedes all other development practices. Any conflict betwe
 
 ---
 
-**Version**: 1.0.0 | **Ratified**: 2025-02-25 | **Last Amended**: 2025-02-25
+**Version**: 1.0.1 | **Ratified**: 2025-02-25 | **Last Amended**: 2026-02-25

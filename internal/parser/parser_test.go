@@ -231,3 +231,126 @@ func TestGoldmarkParser_Parse_InvalidFileError(t *testing.T) {
 	assert.IsType(t, errors.InvalidFileError{}, err)
 	assert.Contains(t, err.Error(), "expected a file, got directory")
 }
+
+// User Story 1: Line number tests
+
+func TestGoldmarkParser_ParseSectionTree_EndLineCalculation(t *testing.T) {
+	content := `# Introduction
+This is the intro.
+More content here.
+
+# Getting Started
+Steps to start.
+More steps.
+
+# Conclusion
+Final thoughts.`
+
+	tmpDir := t.TempDir()
+	tmpFile := filepath.Join(tmpDir, "sections.md")
+	err := os.WriteFile(tmpFile, []byte(content), 0644)
+	require.NoError(t, err)
+
+	parser := NewGoldmarkParser()
+	tree, err := parser.ParseSectionTree(tmpFile)
+	require.NoError(t, err)
+
+	// Should have 3 H1 sections
+	require.Equal(t, 3, len(tree.GetH1Sections()))
+
+	// First section: Introduction (L1 - L4, line before "Getting Started")
+	intro := tree.GetH1Sections()[0]
+	assert.Equal(t, "Introduction", intro.Title)
+	assert.Equal(t, 1, intro.StartLine)
+	assert.Equal(t, 4, intro.EndLine)
+
+	// Second section: Getting Started (L5 - L7)
+	gettingStarted := tree.GetH1Sections()[1]
+	assert.Equal(t, "Getting Started", gettingStarted.Title)
+	assert.Equal(t, 5, gettingStarted.StartLine)
+	assert.Equal(t, 8, gettingStarted.EndLine)
+
+	// Third section: Conclusion (L9 - end of file)
+	conclusion := tree.GetH1Sections()[2]
+	assert.Equal(t, "Conclusion", conclusion.Title)
+	assert.Equal(t, 9, conclusion.StartLine)
+	assert.Equal(t, 10, conclusion.EndLine)
+}
+
+func TestGoldmarkParser_ParseSectionTree_SingleLineSection(t *testing.T) {
+	content := `# Heading Only
+# Next Heading`
+
+	tmpDir := t.TempDir()
+	tmpFile := filepath.Join(tmpDir, "single_line.md")
+	err := os.WriteFile(tmpFile, []byte(content), 0644)
+	require.NoError(t, err)
+
+	parser := NewGoldmarkParser()
+	tree, err := parser.ParseSectionTree(tmpFile)
+	require.NoError(t, err)
+
+	// First heading should have StartLine == EndLine
+	first := tree.GetH1Sections()[0]
+	assert.Equal(t, 1, first.StartLine)
+	assert.Equal(t, 1, first.EndLine)
+
+	// Second heading
+	second := tree.GetH1Sections()[1]
+	assert.Equal(t, 2, second.StartLine)
+	assert.Equal(t, 2, second.EndLine)
+}
+
+func TestGoldmarkParser_ParseSectionTree_HierarchicalSections(t *testing.T) {
+	content := `# Main Section
+Main content.
+
+## Subsection A
+Sub A content.
+More content.
+
+## Subsection B
+Sub B content.
+
+### Deep Subsection
+Deep content.`
+
+	tmpDir := t.TempDir()
+	tmpFile := filepath.Join(tmpDir, "hierarchical.md")
+	err := os.WriteFile(tmpFile, []byte(content), 0644)
+	require.NoError(t, err)
+
+	parser := NewGoldmarkParser()
+	tree, err := parser.ParseSectionTree(tmpFile)
+	require.NoError(t, err)
+
+	// Should have 1 H1
+	h1Sections := tree.GetH1Sections()
+	require.Equal(t, 1, len(h1Sections))
+
+	mainSection := h1Sections[0]
+	assert.Equal(t, "Main Section", mainSection.Title)
+	assert.Equal(t, 2, len(mainSection.Children)) // Two H2 children
+
+	// Check subsection A
+	subA := mainSection.Children[0]
+	assert.Equal(t, "Subsection A", subA.Title)
+	assert.Equal(t, 2, subA.Level)
+	assert.Equal(t, 4, subA.StartLine)
+	assert.Equal(t, 7, subA.EndLine)
+
+	// Check subsection B
+	subB := mainSection.Children[1]
+	assert.Equal(t, "Subsection B", subB.Title)
+	assert.Equal(t, 2, subB.Level)
+	assert.Equal(t, 8, subB.StartLine)
+	assert.Equal(t, 10, subB.EndLine) // Ends at line 10 (line before Deep Subsection at 11)
+	assert.Equal(t, 1, len(subB.Children)) // One H3 child
+
+	// Check deep subsection
+	deep := subB.Children[0]
+	assert.Equal(t, "Deep Subsection", deep.Title)
+	assert.Equal(t, 3, deep.Level)
+	assert.Equal(t, 11, deep.StartLine) // Starts at line 11
+	assert.Equal(t, 12, deep.EndLine)
+}

@@ -5,36 +5,51 @@ import (
 	"mdexplore/internal/models"
 )
 
+// ViewMode represents the current display mode.
+type ViewMode int
+
+const (
+	ViewTOC ViewMode = iota      // Table of contents navigation view
+	ViewContent                  // Section content display view
+)
+
 // Model represents the state of the TUI application.
 type Model struct {
-	Filename string
-	TOC      models.TableOfContents
-	Selected int    // Currently selected heading index
-	Error    error  // Error state (nil if no error)
-	Quitting bool   // Whether the user has requested to quit
-	Width    int    // Terminal width
-	Height   int    // Terminal height
+	Filename         string
+	Tree             *models.SectionTree
+	Selected         int              // Currently selected index in visible sections
+	Error            error            // Error state (nil if no error)
+	Quitting         bool             // Whether the user has requested to quit
+	Width            int              // Terminal width
+	Height           int              // Terminal height
+	ViewMode         ViewMode         // Current view mode
+	ExpandedSections map[string]bool  // Set of expanded section IDs
+	CurrentSection   *models.Section  // Section being viewed (in content mode)
 }
 
-// InitialModel creates a new model with the given filename and TOC.
-func InitialModel(filename string, toc models.TableOfContents) Model {
+// InitialModel creates a new model with the given filename and section tree.
+func InitialModel(filename string, tree *models.SectionTree) Model {
 	return Model{
-		Filename: filename,
-		TOC:      toc,
-		Selected: 0,
-		Error:    nil,
-		Quitting: false,
+		Filename:         filename,
+		Tree:             tree,
+		Selected:         0,
+		Error:            nil,
+		Quitting:         false,
+		ViewMode:         ViewTOC,
+		ExpandedSections: make(map[string]bool),
 	}
 }
 
 // ErrorModel creates a model in error state.
 func ErrorModel(err error) Model {
 	return Model{
-		Filename: "",
-		TOC:      models.TableOfContents{},
-		Selected: 0,
-		Error:    err,
-		Quitting: false,
+		Filename:         "",
+		Tree:             nil,
+		Selected:         0,
+		Error:            err,
+		Quitting:         false,
+		ViewMode:         ViewTOC,
+		ExpandedSections: make(map[string]bool),
 	}
 }
 
@@ -48,9 +63,17 @@ func (m Model) HasError() bool {
 	return m.Error != nil
 }
 
-// IsEmpty returns true if the TOC has no headings.
+// IsEmpty returns true if the tree has no sections.
 func (m Model) IsEmpty() bool {
-	return m.TOC.IsEmpty()
+	return m.Tree == nil || len(m.Tree.GetH1Sections()) == 0
+}
+
+// GetVisibleSections returns the list of currently visible sections based on expansion state.
+func (m Model) GetVisibleSections() []*models.Section {
+	if m.Tree == nil {
+		return nil
+	}
+	return m.Tree.GetFlattenedVisible(m.ExpandedSections)
 }
 
 // CanNavigateUp returns true if we can navigate up.
@@ -60,5 +83,35 @@ func (m Model) CanNavigateUp() bool {
 
 // CanNavigateDown returns true if we can navigate down.
 func (m Model) CanNavigateDown() bool {
-	return m.Selected < len(m.TOC.Headings)-1
+	visible := m.GetVisibleSections()
+	return m.Selected < len(visible)-1
+}
+
+// IsExpanded returns true if the given section ID is expanded.
+func (m Model) IsExpanded(sectionID string) bool {
+	return m.ExpandedSections[sectionID]
+}
+
+// ToggleExpanded toggles the expansion state of a section.
+func (m Model) ToggleExpanded(sectionID string) {
+	m.ExpandedSections[sectionID] = !m.ExpandedSections[sectionID]
+}
+
+// Expand marks a section as expanded.
+func (m Model) Expand(sectionID string) {
+	m.ExpandedSections[sectionID] = true
+}
+
+// Collapse marks a section as collapsed.
+func (m Model) Collapse(sectionID string) {
+	m.ExpandedSections[sectionID] = false
+}
+
+// GetSelectedSection returns the currently selected section.
+func (m Model) GetSelectedSection() *models.Section {
+	visible := m.GetVisibleSections()
+	if m.Selected < 0 || m.Selected >= len(visible) {
+		return nil
+	}
+	return visible[m.Selected]
 }

@@ -188,3 +188,156 @@ func extractText(content []byte, h *ast.Heading) string {
 	}
 	return string(result)
 }
+
+// byteOffsetToLine converts a byte offset to a 1-based line number.
+func byteOffsetToLine(content []byte, offset int) int {
+	line := 1
+	for i := 0; i < offset && i < len(content); i++ {
+		if content[i] == '\n' {
+			line++
+		}
+	}
+	return line
+}
+
+// ParseSectionTree reads a markdown file and builds a hierarchical section tree with line ranges.
+func (p *GoldmarkParser) ParseSectionTree(filepath string) (*models.SectionTree, error) {
+	// Validate file first
+	if err := p.validateFile(filepath); err != nil {
+		return nil, err
+	}
+
+	// Read original file content (before stripping frontmatter)
+	originalContent, err := os.ReadFile(filepath)
+	if err != nil {
+		if os.IsPermission(err) {
+			return nil, errors.PermissionDeniedError{Path: filepath}
+		}
+		return nil, fmt.Errorf("failed to read file: %w", err)
+	}
+
+	// Count total lines in original file
+	lines := bytes.Split(originalContent, []byte("\n"))
+	totalLines := len(lines)
+	if len(originalContent) > 0 && len(lines[len(lines)-1]) == 0 {
+		totalLines--
+	}
+	if totalLines < 1 {
+		totalLines = 1
+	}
+
+	// Calculate frontmatter offset
+	frontmatterOffset := 0
+	if bytes.HasPrefix(originalContent, []byte("---")) {
+		lines := bytes.Split(originalContent, []byte("\n"))
+		for i := 1; i < len(lines); i++ {
+			if bytes.HasPrefix(bytes.TrimSpace(lines[i]), []byte("---")) {
+				// Count lines in frontmatter including the closing ---
+				frontmatterOffset = i + 1
+				break
+			}
+		}
+	}
+
+	// Strip YAML frontmatter for parsing
+	content := stripFrontmatter(originalContent)
+
+	// Create Goldmark parser
+	gm := goldmark.New()
+
+	// Parse the markdown
+	doc := gm.Parser().Parse(text.NewReader(content))
+
+	// Extract sections with line numbers
+	var sections []*models.Section
+	var inCodeBlock bool
+
+	ast.Walk(doc, func(n ast.Node, entering bool) (ast.WalkStatus, error) {
+		if entering {
+			switch n.Kind() {
+			case ast.KindFencedCodeBlock, ast.KindCodeBlock:
+				inCodeBlock = true
+			case ast.KindHeading:
+				if !inCodeBlock {
+					h := n.(*ast.Heading)
+					lineNumber := 1
+					if segment := h.Lines(); segment.Len() > 0 {
+						// Convert byte offset to line number
+						offset := segment.At(0).Start
+						lineNumber = byteOffsetToLine(content, offset) + frontmatterOffset
+					}
+
+					text := extractText(content, h)
+					section := &models.Section{
+						ID:        fmt.Sprintf("L%d", lineNumber),
+						Level:     h.Level,
+						Title:     text,
+						StartLine: lineNumber,
+						Children:  []*models.Section{},
+					}
+					sections = append(sections, section)
+				}
+			}
+		} else {
+			switch n.Kind() {
+			case ast.KindFencedCodeBlock, ast.KindCodeBlock:
+				inCodeBlock = false
+			}
+		}
+		return ast.WalkContinue, nil
+	})
+
+	// Calculate end lines for each section
+	for i, section := range sections {
+		if i < len(sections)-1 {
+			// End at the line before the next heading
+			section.EndLine = sections[i+1].StartLine - 1
+		} else {
+			// Last section ends at end of file
+			section.EndLine = totalLines
+		}
+	}
+
+	// Build hierarchical tree structure
+	root := &models.Section{
+		ID:       "root",
+		Level:    0,
+		Title:    "Root",
+		Children: []*models.Section{},
+	}
+
+	byID := make(map[string]*models.Section)
+	for _, section := range sections {
+		byID[section.ID] = section
+	}
+
+	// Build parent-child relationships
+	var lastParent [7]*models.Section // Track last section at each level (0-6)
+	lastParent[0] = root
+
+	for _, section := range sections {
+		// Find the appropriate parent
+		parentLevel := section.Level - 1
+		for parentLevel > 0 && lastParent[parentLevel] == nil {
+			parentLevel--
+		}
+
+		if parent := lastParent[parentLevel]; parent != nil {
+			section.Parent = parent
+			parent.Children = append(parent.Children, section)
+		}
+
+		// Update this level and reset deeper levels
+		lastParent[section.Level] = section
+		for i := section.Level + 1; i < len(lastParent); i++ {
+			lastParent[i] = nil
+		}
+	}
+
+	return &models.SectionTree{
+		Root:     root,
+		Source:   filepath,
+		Sections: sections,
+		ByID:     byID,
+	}, nil
+}
