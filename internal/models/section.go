@@ -23,6 +23,11 @@ func (s *Section) HasChildren() bool {
 	return len(s.Children) > 0
 }
 
+// IsLeaf returns true if section has no children.
+func (s *Section) IsLeaf() bool {
+	return len(s.Children) == 0
+}
+
 // GetAllDescendants returns flattened list of all nested sections recursively.
 func (s *Section) GetAllDescendants() []*Section {
 	var result []*Section
@@ -31,6 +36,20 @@ func (s *Section) GetAllDescendants() []*Section {
 		result = append(result, child.GetAllDescendants()...)
 	}
 	return result
+}
+
+// GetFullContent returns the combined RawContent of this section and all descendants.
+func (s *Section) GetFullContent() string {
+	var contents []string
+	if s.RawContent != "" {
+		contents = append(contents, s.RawContent)
+	}
+	for _, desc := range s.GetAllDescendants() {
+		if desc.RawContent != "" {
+			contents = append(contents, desc.RawContent)
+		}
+	}
+	return strings.Join(contents, "\n\n")
 }
 
 // GetVisibleDescendants returns immediate children (for expansion display).

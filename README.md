@@ -94,9 +94,9 @@ When the TUI is open:
 | Key | Action |
 |-----|--------|
 | `↑` / `↓` or `k` / `j` | Navigate up/down |
-| `→` | Expand selected section (reveals subsections) |
-| `←` | Collapse selected section |
-| `Enter` | View section content |
+| `→` | Expand section **OR** open content (if leaf section) |
+| `←` | Collapse section **OR** return from content view |
+| `Enter` | View full section content (including subsections) |
 | `Esc` | Return from content view / Quit from TOC |
 | `q` / `Ctrl+C` | Quit |
 
@@ -106,16 +106,16 @@ When the TUI is open:
 ```
 📄 README.md - Table of Contents
 
-  1.     L1-4      ▶ Introduction
-  1.1.   L5-8      ├── Installation
-  1.1.1. L9-14     │   └── Requirements
-  1.1.2. L15-18    │   └── Setup
-  1.2.   L19-20    ├── Usage
-  1.2.1. L21-24    │   └── Basic Commands
-  1.2.2. L25-28    │   └── Advanced Options
-  1.3.   L29-31    └── License
+  L1-4      ▶ 1. Introduction
+  L5-8      ├── 1.1. Installation
+  L9-14     │   └── 1.1.1. Requirements
+  L15-18    │   └── 1.1.2. Setup
+  L19-20    ├── 1.2. Usage
+  L21-24    │   └── 1.2.1. Basic Commands
+  L25-28    │   └── 1.2.2. Advanced Options
+  L29-31    └── 1.3. License
 
-[↑/↓] Navigate  [→] Expand  [←] Collapse  [Enter] View  [q] Quit
+[↑/↓] Navigate  [→] Expand/Open  [←] Collapse/Back  [Enter] Full Content  [q] Quit
 ```
 
 ### Content View

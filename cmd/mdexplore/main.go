@@ -159,7 +159,7 @@ func printSectionTree(tree *models.SectionTree) {
 	numberedSections := tree.AssignNumbers()
 	for _, ns := range numberedSections {
 		indent := strings.Repeat("  ", ns.Section.GetDepth())
-		fmt.Printf("%-6s L%d-%d %s%s\n", ns.DisplayNumber, ns.Section.StartLine, ns.Section.EndLine, indent, ns.Section.Title)
+		fmt.Printf("L%d-%d %s %s %s\n", ns.Section.StartLine, ns.Section.EndLine, indent, ns.DisplayNumber, ns.Section.Title)
 	}
 }
 
