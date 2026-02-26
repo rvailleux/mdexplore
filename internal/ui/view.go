@@ -34,10 +34,6 @@ var (
 	lineNumberStyle = lipgloss.NewStyle().
 		Foreground(lipgloss.Color("#666666"))
 
-	selectedLineNumberStyle = lipgloss.NewStyle().
-		Foreground(lipgloss.Color("#888888")).
-		Background(lipgloss.Color("#2D2D2D"))
-
 	selectedNumberStyle = lipgloss.NewStyle().
 		Foreground(lipgloss.Color("#FFB347")).
 		Background(lipgloss.Color("#2D2D2D")).
