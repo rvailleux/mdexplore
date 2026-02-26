@@ -19,7 +19,7 @@ var (
 	selectedStyle = lipgloss.NewStyle().
 		Bold(true).
 		Foreground(lipgloss.Color("#00D26A")).
-		Background(lipgloss.Color("#2D2D2D"))
+		Background(lipgloss.Color("#0D2818"))
 
 	normalStyle = lipgloss.NewStyle().
 		Foreground(lipgloss.Color("#DDDDDD"))
