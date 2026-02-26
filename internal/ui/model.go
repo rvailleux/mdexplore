@@ -25,6 +25,7 @@ type Model struct {
 	ViewMode         ViewMode         // Current view mode
 	ExpandedSections map[string]bool  // Set of expanded section IDs
 	CurrentSection   *models.Section  // Section being viewed (in content mode)
+	ReturnIndex      int              // Position to restore when returning from content view
 }
 
 // InitialModel creates a new model with the given filename and section tree.

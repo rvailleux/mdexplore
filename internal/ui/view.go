@@ -18,8 +18,8 @@ var (
 
 	selectedStyle = lipgloss.NewStyle().
 		Bold(true).
-		Foreground(lipgloss.Color("#00D26A")).
-		Background(lipgloss.Color("#2D2D2D"))
+		Foreground(lipgloss.Color("#1A1A1A")).
+		Background(lipgloss.Color("#00D26A"))
 
 	normalStyle = lipgloss.NewStyle().
 		Foreground(lipgloss.Color("#DDDDDD"))
@@ -172,8 +172,8 @@ func (m Model) renderContent() string {
 	b.WriteString(title)
 	b.WriteString("\n\n")
 
-	// Content - use RawContent if available, otherwise extract from file
-	content := m.CurrentSection.RawContent
+	// Content - use GetFullContent to include subsections
+	content := m.CurrentSection.GetFullContent()
 	if content == "" {
 		// Try to extract from file
 		if extracted, err := extractSectionFromFile(m.Filename, m.CurrentSection.StartLine, m.CurrentSection.EndLine); err == nil {
@@ -220,11 +220,6 @@ func extractSectionFromFile(filepath string, startLine, endLine int) (string, er
 func renderSectionWithNumber(section *models.Section, ns *models.NumberedSection, index, selected int, isExpanded bool) string {
 	var b strings.Builder
 
-	// Section number (e.g., "1.1.")
-	if ns != nil {
-		b.WriteString(numberStyle.Render(fmt.Sprintf("%-6s ", ns.DisplayNumber)))
-	}
-
 	// Line numbers in format "L[start]-[end]"
 	lineNum := fmt.Sprintf("L%d-%d", section.StartLine, section.EndLine)
 	b.WriteString(lineNumberStyle.Render(fmt.Sprintf("%-10s ", lineNum)))
@@ -236,6 +231,12 @@ func renderSectionWithNumber(section *models.Section, ns *models.NumberedSection
 	// Tree prefix based on level and expansion state
 	prefix := getTreePrefix(section.Level, section.HasChildren(), isExpanded)
 	b.WriteString(treeStyle.Render(prefix))
+
+	// Section number (e.g., "1.1.") - positioned next to title
+	if ns != nil {
+		b.WriteString(" ")
+		b.WriteString(numberStyle.Render(ns.DisplayNumber))
+	}
 
 	// Section title
 	b.WriteString(" ")

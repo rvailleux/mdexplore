@@ -29,10 +29,11 @@ func (m Model) handleKeyPress(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	// Handle content view mode separately
 	if m.ViewMode == ViewContent {
 		switch msg.String() {
-		case "esc":
+		case "esc", "left", "h":
 			// Return to TOC view
 			m.ViewMode = ViewTOC
 			m.CurrentSection = nil
+			m.Selected = m.ReturnIndex
 		case "q", "ctrl+c":
 			m.Quitting = true
 			return m, tea.Quit
@@ -57,10 +58,18 @@ func (m Model) handleKeyPress(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 
 	case "right", "l":
-		// Expand selected section
+		// Expand selected section or open content if leaf
 		if selected := m.GetSelectedSection(); selected != nil {
-			if selected.HasChildren() && !m.IsExpanded(selected.ID) {
-				m.Expand(selected.ID)
+			if selected.HasChildren() {
+				// Parent section: expand/collapse
+				if !m.IsExpanded(selected.ID) {
+					m.Expand(selected.ID)
+				}
+			} else {
+				// Leaf section: open content view
+				m.ReturnIndex = m.Selected
+				m.CurrentSection = selected
+				m.ViewMode = ViewContent
 			}
 		}
 
@@ -75,6 +84,7 @@ func (m Model) handleKeyPress(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	case "enter":
 		// View content of selected section
 		if selected := m.GetSelectedSection(); selected != nil {
+			m.ReturnIndex = m.Selected
 			m.CurrentSection = selected
 			m.ViewMode = ViewContent
 		}

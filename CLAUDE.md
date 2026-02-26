@@ -5,6 +5,8 @@ Auto-generated from all feature plans. Last updated: 2026-02-25
 ## Active Technologies
 - Go 1.23+ (existing codebase) + Bubble Tea (TUI), Goldmark (markdown parsing), Lipgloss (styling), Cobra (CLI) (002-section-navigation)
 - File-based (reads markdown files from disk) (002-section-navigation)
+- Go 1.23+ + Bubble Tea (TUI framework), Goldmark (markdown parsing), Lipgloss (styling) (004-tui-navigation-enhancement)
+- N/A (in-memory document parsing) (004-tui-navigation-enhancement)
 
 - Go 1.23+ + Bubble Tea (TUI), Goldmark (markdown parsing), Lipgloss (styling) (001-mdexplore-toc)
 
@@ -24,6 +26,7 @@ tests/
 Go 1.23+: Follow standard conventions
 
 ## Recent Changes
+- 004-tui-navigation-enhancement: Added Go 1.23+ + Bubble Tea (TUI framework), Goldmark (markdown parsing), Lipgloss (styling)
 - 002-section-navigation: Added Go 1.23+ (existing codebase) + Bubble Tea (TUI), Goldmark (markdown parsing), Lipgloss (styling), Cobra (CLI)
 
 - 001-mdexplore-toc: Added Go 1.23+ + Bubble Tea (TUI), Goldmark (markdown parsing), Lipgloss (styling)
