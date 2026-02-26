@@ -177,14 +177,17 @@ func (m Model) renderContent() string {
 	b.WriteString(title)
 	b.WriteString("\n\n")
 
-	// Content - use GetFullContent to include subsections
-	content := m.CurrentSection.GetFullContent()
-	if content == "" {
-		// Try to extract from file
-		if extracted, err := extractSectionFromFile(m.Filename, m.CurrentSection.StartLine, m.CurrentSection.EndLine); err == nil {
-			content = extracted
+	// Content - include this section and all descendants
+	// Find the last line of this section and all descendants
+	endLine := m.CurrentSection.EndLine
+	for _, desc := range m.CurrentSection.GetAllDescendants() {
+		if desc.EndLine > endLine {
+			endLine = desc.EndLine
 		}
 	}
+
+	// Extract content from file using the extended range
+	content, _ := extractSectionFromFile(m.Filename, m.CurrentSection.StartLine, endLine)
 
 	// Render markdown with Glamour
 	var renderedContent string
