@@ -208,11 +208,28 @@ func (m Model) renderContent() string {
 		renderedContent = content
 	}
 
+	// Calculate viewport dimensions
+	m.ViewportHeight = CalculateViewportHeight(m.Height)
+	contentLines := strings.Split(renderedContent, "\n")
+	m.ContentTotalLines = len(contentLines)
+
+	// Get visible window of content
+	start, end := GetVisibleRange(m.ContentScrollOffset, m.ContentTotalLines, m.ViewportHeight)
+	visibleLines := contentLines[start:end]
+	visibleContent := strings.Join(visibleLines, "\n")
+
 	// Apply minimal padding to the rendered content
-	b.WriteString(contentStyle.Render(renderedContent))
+	b.WriteString(contentStyle.Render(visibleContent))
+
+	// Calculate scroll percentage for indicator
+	scrollPercent := CalculateScrollPercentage(m.ContentScrollOffset, m.ContentTotalLines, m.ViewportHeight)
+	scrollIndicator := ""
+	if m.ContentTotalLines > m.ViewportHeight {
+		scrollIndicator = fmt.Sprintf("[%3d%%] ", scrollPercent)
+	}
 
 	b.WriteString("\n\n")
-	b.WriteString(helpStyle.Render("[Esc] Return to navigation  [q] Quit"))
+	b.WriteString(helpStyle.Render(scrollIndicator + "[↑/↓] Scroll [PgUp/PgDown] Page [Esc] Back [q] Quit"))
 	b.WriteString("\n")
 
 	return b.String()

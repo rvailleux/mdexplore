@@ -13,6 +13,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.Width = msg.Width
 		m.Height = msg.Height
+		// Recalculate viewport height and clamp scroll offset if needed
+		if m.ViewMode == ViewContent {
+			newViewportHeight := CalculateViewportHeight(m.Height)
+			maxOffset := CalculateMaxOffset(m.ContentTotalLines, newViewportHeight)
+			m.ContentScrollOffset = ClampOffset(m.ContentScrollOffset, maxOffset)
+		}
 	}
 
 	return m, nil
@@ -37,6 +43,30 @@ func (m Model) handleKeyPress(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		case "q", "ctrl+c":
 			m.Quitting = true
 			return m, tea.Quit
+		case "up", "k":
+			// Scroll up by one line
+			if m.ContentScrollOffset > 0 {
+				m.ContentScrollOffset--
+			}
+		case "down", "j":
+			// Scroll down by one line
+			maxOffset := CalculateMaxOffset(m.ContentTotalLines, m.ViewportHeight)
+			if m.ContentScrollOffset < maxOffset {
+				m.ContentScrollOffset++
+			}
+		case "pgup":
+			// Page up - scroll by viewport height
+			m.ContentScrollOffset = max(0, m.ContentScrollOffset-m.ViewportHeight)
+		case "pgdown":
+			// Page down - scroll by viewport height
+			maxOffset := CalculateMaxOffset(m.ContentTotalLines, m.ViewportHeight)
+			m.ContentScrollOffset = min(maxOffset, m.ContentScrollOffset+m.ViewportHeight)
+		case "home", "g":
+			// Jump to top
+			m.ContentScrollOffset = 0
+		case "end", "G":
+			// Jump to bottom
+			m.ContentScrollOffset = CalculateMaxOffset(m.ContentTotalLines, m.ViewportHeight)
 		}
 		return m, nil
 	}
@@ -70,6 +100,7 @@ func (m Model) handleKeyPress(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 				m.ReturnIndex = m.Selected
 				m.CurrentSection = selected
 				m.ViewMode = ViewContent
+				m.ContentScrollOffset = 0 // Reset scroll position
 			}
 		}
 
@@ -87,6 +118,7 @@ func (m Model) handleKeyPress(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			m.ReturnIndex = m.Selected
 			m.CurrentSection = selected
 			m.ViewMode = ViewContent
+			m.ContentScrollOffset = 0 // Reset scroll position
 		}
 
 	case "esc":

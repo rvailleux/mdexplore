@@ -8,6 +8,8 @@ Auto-generated from all feature plans. Last updated: 2026-02-25
 - Go 1.23+ + Bubble Tea (TUI framework), Goldmark (markdown parsing), Lipgloss (styling) (004-tui-navigation-enhancement)
 - N/A (in-memory document parsing) (004-tui-navigation-enhancement)
 - N/A (in-memory rendering) (005-markdown-rendering)
+- Go 1.23+ + Bubble Tea (TUI framework), Bubbles (viewport component), Lipgloss (styling), Goldmark (markdown rendering) (006-tty-viewport-scrolling)
+- N/A (in-memory content rendering) (006-tty-viewport-scrolling)
 
 - Go 1.23+ + Bubble Tea (TUI), Goldmark (markdown parsing), Lipgloss (styling) (001-mdexplore-toc)
 
@@ -27,9 +29,9 @@ tests/
 Go 1.23+: Follow standard conventions
 
 ## Recent Changes
+- 006-tty-viewport-scrolling: Added Go 1.23+ + Bubble Tea (TUI framework), Bubbles (viewport component), Lipgloss (styling), Goldmark (markdown rendering)
 - 005-markdown-rendering: Added Go 1.23+
 - 004-tui-navigation-enhancement: Added Go 1.23+ + Bubble Tea (TUI framework), Goldmark (markdown parsing), Lipgloss (styling)
-- 002-section-navigation: Added Go 1.23+ (existing codebase) + Bubble Tea (TUI), Goldmark (markdown parsing), Lipgloss (styling), Cobra (CLI)
 
 
 <!-- MANUAL ADDITIONS START -->

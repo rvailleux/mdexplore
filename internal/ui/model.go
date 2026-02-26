@@ -24,46 +24,55 @@ func (r *glamourRenderer) Render(markdown string, width int) (string, error) {
 
 // Model represents the state of the TUI application.
 type Model struct {
-	Filename         string
-	Tree             *models.SectionTree
-	Selected         int              // Currently selected index in visible sections
-	Error            error            // Error state (nil if no error)
-	Quitting         bool             // Whether the user has requested to quit
-	Width            int              // Terminal width
-	Height           int              // Terminal height
-	ViewMode         ViewMode         // Current view mode
-	ExpandedSections map[string]bool  // Set of expanded section IDs
-	CurrentSection   *models.Section  // Section being viewed (in content mode)
-	ReturnIndex      int              // Position to restore when returning from content view
-	markdownRenderer renderer.Renderer // Markdown renderer for content display
+	Filename            string
+	Tree                *models.SectionTree
+	Selected            int             // Currently selected index in visible sections
+	Error               error           // Error state (nil if no error)
+	Quitting            bool            // Whether the user has requested to quit
+	Width               int             // Terminal width
+	Height              int             // Terminal height
+	ViewMode            ViewMode        // Current view mode
+	ExpandedSections    map[string]bool // Set of expanded section IDs
+	CurrentSection      *models.Section // Section being viewed (in content mode)
+	ReturnIndex         int             // Position to restore when returning from content view
+	markdownRenderer    renderer.Renderer
+	ContentScrollOffset int // Lines scrolled from top (0 = at top)
+	ContentTotalLines   int // Total lines in rendered content
+	ViewportHeight      int // Available lines for content display
 }
 
 // InitialModel creates a new model with the given filename and section tree.
 func InitialModel(filename string, tree *models.SectionTree) Model {
 	return Model{
-		Filename:         filename,
-		Tree:             tree,
-		Selected:         0,
-		Error:            nil,
-		Quitting:         false,
-		ViewMode:         ViewTOC,
-		ExpandedSections: make(map[string]bool),
-		markdownRenderer: &glamourRenderer{},
+		Filename:            filename,
+		Tree:                tree,
+		Selected:            0,
+		Error:               nil,
+		Quitting:            false,
+		ViewMode:            ViewTOC,
+		ExpandedSections:    make(map[string]bool),
+		markdownRenderer:    &glamourRenderer{},
+		ContentScrollOffset: 0,
+		ContentTotalLines:   0,
+		ViewportHeight:      0,
 	}
 }
 
 // InitialModelWithSelection creates a new model with a pre-selected section.
 func InitialModelWithSelection(filename string, tree *models.SectionTree, targetSection *models.Section) Model {
 	m := Model{
-		Filename:         filename,
-		Tree:             tree,
-		Selected:         0,
-		Error:            nil,
-		Quitting:         false,
-		ViewMode:         ViewContent, // Start in content view
-		ExpandedSections: make(map[string]bool),
-		CurrentSection:   targetSection,
-		markdownRenderer: &glamourRenderer{},
+		Filename:            filename,
+		Tree:                tree,
+		Selected:            0,
+		Error:               nil,
+		Quitting:            false,
+		ViewMode:            ViewContent, // Start in content view
+		ExpandedSections:    make(map[string]bool),
+		CurrentSection:      targetSection,
+		markdownRenderer:    &glamourRenderer{},
+		ContentScrollOffset: 0,
+		ContentTotalLines:   0,
+		ViewportHeight:      0,
 	}
 
 	// Expand all parent sections to make target visible
