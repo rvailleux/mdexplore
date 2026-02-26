@@ -40,6 +40,39 @@ func InitialModel(filename string, tree *models.SectionTree) Model {
 	}
 }
 
+// InitialModelWithSelection creates a new model with a pre-selected section.
+func InitialModelWithSelection(filename string, tree *models.SectionTree, targetSection *models.Section) Model {
+	m := Model{
+		Filename:         filename,
+		Tree:             tree,
+		Selected:         0,
+		Error:            nil,
+		Quitting:         false,
+		ViewMode:         ViewContent, // Start in content view
+		ExpandedSections: make(map[string]bool),
+		CurrentSection:   targetSection,
+	}
+
+	// Expand all parent sections to make target visible
+	if targetSection != nil && tree != nil {
+		path := tree.GetSectionPath(targetSection)
+		for _, section := range path {
+			m.Expand(section.ID)
+		}
+
+		// Find the index of the target section in visible sections
+		visible := m.GetVisibleSections()
+		for i, section := range visible {
+			if section.ID == targetSection.ID {
+				m.Selected = i
+				break
+			}
+		}
+	}
+
+	return m
+}
+
 // ErrorModel creates a model in error state.
 func ErrorModel(err error) Model {
 	return Model{

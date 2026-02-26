@@ -1,5 +1,11 @@
 package models
 
+import (
+	"fmt"
+	"strconv"
+	"strings"
+)
+
 // Section represents a hierarchical document section with heading, line range, and content.
 type Section struct {
 	ID         string     // Unique identifier (format: "L{StartLine}")
@@ -202,4 +208,139 @@ type DisplaySection struct {
 	IsSelected   bool     // Whether this item has keyboard focus
 	IsExpanded   bool     // Whether this section's children are visible
 	CanExpand    bool     // Whether this section has children to expand
+}
+
+// SectionNumber represents a hierarchical section number (e.g., "1.1.2").
+type SectionNumber struct {
+	Parts []int // The number components (e.g., [1, 1] for "1.1")
+}
+
+// String returns the formatted section number (e.g., "1.1.").
+func (sn SectionNumber) String() string {
+	if len(sn.Parts) == 0 {
+		return ""
+	}
+	result := ""
+	for _, part := range sn.Parts {
+		result += fmt.Sprintf("%d.", part)
+	}
+	return result
+}
+
+// Parent returns the parent section number.
+func (sn SectionNumber) Parent() SectionNumber {
+	if len(sn.Parts) <= 1 {
+		return SectionNumber{}
+	}
+	return SectionNumber{Parts: sn.Parts[:len(sn.Parts)-1]}
+}
+
+// IsAncestorOf returns true if this number is an ancestor of the given number.
+func (sn SectionNumber) IsAncestorOf(other SectionNumber) bool {
+	if len(sn.Parts) >= len(other.Parts) {
+		return false
+	}
+	for i := range sn.Parts {
+		if sn.Parts[i] != other.Parts[i] {
+			return false
+		}
+	}
+	return true
+}
+
+// Equals returns true if the section numbers are equal.
+func (sn SectionNumber) Equals(other SectionNumber) bool {
+	if len(sn.Parts) != len(other.Parts) {
+		return false
+	}
+	for i := range sn.Parts {
+		if sn.Parts[i] != other.Parts[i] {
+			return false
+		}
+	}
+	return true
+}
+
+// Depth returns the depth level (number of parts).
+func (sn SectionNumber) Depth() int {
+	return len(sn.Parts)
+}
+
+// ParseSectionNumber parses a section number string (e.g., "1.1").
+func ParseSectionNumber(s string) (SectionNumber, error) {
+	var parts []int
+	s = strings.TrimSuffix(s, ".")
+	if s == "" {
+		return SectionNumber{}, fmt.Errorf("empty section number")
+	}
+	for _, part := range strings.Split(s, ".") {
+		num, err := strconv.Atoi(part)
+		if err != nil || num < 1 {
+			return SectionNumber{}, fmt.Errorf("invalid section number part: %s", part)
+		}
+		parts = append(parts, num)
+	}
+	return SectionNumber{Parts: parts}, nil
+}
+
+// NumberedSection wraps a Section with its hierarchical number.
+type NumberedSection struct {
+	Section       *Section
+	Number        SectionNumber
+	DisplayNumber string
+}
+
+// AssignNumbers assigns hierarchical numbers to all sections in the tree.
+func (t *SectionTree) AssignNumbers() []*NumberedSection {
+	var result []*NumberedSection
+	counters := make(map[int]int) // Track counters at each depth
+
+	for _, section := range t.Sections {
+		depth := section.GetDepth()
+		counters[depth]++
+		// Reset deeper counters
+		for d := depth + 1; d <= 6; d++ {
+			counters[d] = 0
+		}
+
+		// Build the number parts
+		parts := make([]int, depth+1)
+		for d := 0; d <= depth; d++ {
+			parts[d] = counters[d]
+		}
+
+		num := SectionNumber{Parts: parts}
+		result = append(result, &NumberedSection{
+			Section:       section,
+			Number:        num,
+			DisplayNumber: num.String(),
+		})
+	}
+
+	return result
+}
+
+// FindByNumber finds a section by its hierarchical number.
+func (t *SectionTree) FindByNumber(target SectionNumber) (*Section, bool) {
+	numbered := t.AssignNumbers()
+	for _, ns := range numbered {
+		if ns.Number.Equals(target) {
+			return ns.Section, true
+		}
+	}
+	return nil, false
+}
+
+// GetSectionPath returns the path of sections from root to the given section.
+func (t *SectionTree) GetSectionPath(section *Section) []*Section {
+	var path []*Section
+	current := section
+	for current != nil && current.Parent != nil && current.Parent.Level > 0 {
+		path = append([]*Section{current}, path...)
+		current = current.Parent
+	}
+	if current != nil && current.Level > 0 {
+		path = append([]*Section{current}, path...)
+	}
+	return path
 }
