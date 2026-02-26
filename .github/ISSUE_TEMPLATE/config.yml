@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question
+    url: https://github.com/rvailleux/mdexplore/discussions
+    about: Ask a question or start a discussion
+  - name: Documentation
+    url: https://github.com/rvailleux/mdexplore#readme
+    about: Check the README for documentation

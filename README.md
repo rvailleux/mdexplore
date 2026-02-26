@@ -1,6 +1,28 @@
 # mdexplore - Markdown TOC Explorer
 
+[![CI](https://github.com/rvailleux/mdexplore/actions/workflows/ci.yml/badge.svg)](https://github.com/rvailleux/mdexplore/actions/workflows/ci.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/rvailleux/mdexplore)](https://goreportcard.com/report/github.com/rvailleux/mdexplore)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Go Version](https://img.shields.io/badge/go-1.23+-blue.svg)](https://golang.org)
+
 A CLI tool that displays a hierarchical table of contents from markdown files using an interactive TUI.
+
+<p align="center">
+  <img src="docs/screenshot.png" alt="mdexplore screenshot" width="600">
+</p>
+
+## Table of Contents
+
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Key Bindings](#key-bindings)
+- [Examples](#examples)
+- [Command-Line Options](#command-line-options)
+- [Exit Codes](#exit-codes)
+- [Development](#development)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Features
 
@@ -17,10 +39,23 @@ A CLI tool that displays a hierarchical table of contents from markdown files us
 
 ## Installation
 
+### From Source
+
 ```bash
-go build -o mdexplore ./cmd/mdexplore
-go install ./cmd/mdexplore
+go install github.com/rvailleux/mdexplore/cmd/mdexplore@latest
 ```
+
+### Build Locally
+
+```bash
+git clone https://github.com/rvailleux/mdexplore.git
+cd mdexplore
+go build -o mdexplore ./cmd/mdexplore
+```
+
+### Pre-built Binaries
+
+Download pre-built binaries from the [releases page](https://github.com/rvailleux/mdexplore/releases).
 
 ## Usage
 
@@ -57,7 +92,7 @@ When the TUI is open:
 | `Esc` | Return from content view / Quit from TOC |
 | `q` / `Ctrl+C` | Quit |
 
-## Example Output
+## Examples
 
 ### Table of Contents View
 ```
@@ -109,6 +144,27 @@ When the TUI is open:
 
 ## Development
 
+### Prerequisites
+
+- Go 1.23 or later
+- Git
+
+### Building
+
+```bash
+# Clone the repository
+git clone https://github.com/rvailleux/mdexplore.git
+cd mdexplore
+
+# Build
+go build -o mdexplore ./cmd/mdexplore
+
+# Install locally
+go install ./cmd/mdexplore
+```
+
+### Testing
+
 ```bash
 # Run tests
 go test ./...
@@ -116,18 +172,53 @@ go test ./...
 # Run tests with coverage
 go test -cover ./...
 
+# Run tests with verbose output
+go test -v ./...
+
 # Run benchmarks
 go test ./tests/benchmark -bench=.
-
-# Build
-go build -o mdexplore ./cmd/mdexplore
 ```
 
-## Requirements
+### Project Structure
 
-- Go 1.23+
-- Terminal with UTF-8 and color support
+```
+cmd/mdexplore/       # CLI entry point
+internal/
+  models/            # Data models (Section, SectionTree)
+  parser/            # Markdown parsing (Goldmark)
+  ui/                # TUI components (Bubble Tea)
+  renderer/          # Content rendering
+  errors/            # Error types
+tests/
+  integration/       # Integration tests
+  benchmark/         # Performance tests
+  fixtures/          # Test data
+```
+
+## Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+- [Code of Conduct](CODE_OF_CONDUCT.md)
+- [Security Policy](SECURITY.md)
+- [Changelog](CHANGELOG.md)
+
+### Quick Start for Contributors
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes
+4. Run tests (`go test ./...`)
+5. Commit your changes (`git commit -m 'feat: add amazing feature'`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
 
 ## License
 
-MIT
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea) - The TUI framework
+- Markdown parsing powered by [Goldmark](https://github.com/yuin/goldmark)
+- Styled with [Lipgloss](https://github.com/charmbracelet/lipgloss)
