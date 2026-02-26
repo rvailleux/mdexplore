@@ -10,6 +10,7 @@ import (
 	"mdexplore/internal/errors"
 	"mdexplore/internal/models"
 	"mdexplore/internal/parser"
+	"mdexplore/internal/renderer"
 	"mdexplore/internal/ui"
 )
 
@@ -22,6 +23,7 @@ var (
 	showVer       bool
 	maxLevel      int
 	selectSection string
+	currentFilepath string // Store filepath for non-TTY content display
 )
 
 func main() {
@@ -77,6 +79,7 @@ func run(cmd *cobra.Command, args []string) error {
 	}
 
 	filepath := args[0]
+	currentFilepath = filepath // Store for later use
 
 	// Parse the markdown file into a section tree
 	p := parser.NewGoldmarkParser()
@@ -165,30 +168,36 @@ func printSectionTree(tree *models.SectionTree) {
 	}
 }
 
-// printSelectedSection prints only the selected section and its subsections
+// printSelectedSection prints the full content of the selected section and its subsections
 func printSelectedSection(tree *models.SectionTree, target *models.Section) {
 	if tree == nil || target == nil {
 		fmt.Println("No headings found.")
 		return
 	}
 
-	numberedSections := tree.AssignNumbers()
-
-	// Find the target's section number to identify its descendants
-	var targetNum models.SectionNumber
-	for _, ns := range numberedSections {
-		if ns.Section.ID == target.ID {
-			targetNum = ns.Number
-			break
+	// Find the last line of this section and all descendants
+	endLine := target.EndLine
+	for _, desc := range target.GetAllDescendants() {
+		if desc.EndLine > endLine {
+			endLine = desc.EndLine
 		}
 	}
 
-	for _, ns := range numberedSections {
-		// Print if this is the target or a descendant of the target
-		if ns.Section.ID == target.ID || targetNum.IsAncestorOf(ns.Number) {
-			indent := strings.Repeat("  ", ns.Section.GetDepth()-target.GetDepth())
-			fmt.Printf("%-6s L%d-%d %s%s\n", ns.DisplayNumber, ns.Section.StartLine, ns.Section.EndLine, indent, ns.Section.Title)
-		}
+	// Extract content from file using line ranges
+	content, err := renderer.ExtractSectionContent(currentFilepath, target.StartLine, endLine)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error reading content: %v\n", err)
+		return
+	}
+
+	// Render the content with markdown formatting
+	// Use a reasonable width for terminal output (80 columns default)
+	rendered, err := renderer.RenderMarkdown(content, 80)
+	if err == nil && rendered != "" {
+		fmt.Print(rendered)
+	} else {
+		// Fallback to raw content if rendering fails
+		fmt.Print(content)
 	}
 }
 
