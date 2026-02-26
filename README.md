@@ -28,6 +28,8 @@ A CLI tool that displays a hierarchical table of contents from markdown files us
 
 - **Interactive TUI**: Navigate through your markdown document structure with an elegant Bubble Tea interface
 - **Line Numbers**: Each section shows its line range (`L[start]-[end]`) for quick reference
+- **Hierarchical Numbering**: Sections are numbered (1., 1.1, 1.1.1) for easy reference
+- **Pre-select Sections**: Use `--select` flag to jump directly to a specific section
 - **Hierarchical Navigation**: Expand/collapse sections to focus on specific parts of your document
 - **Content View**: View section content directly in the terminal without leaving the tool
 - **Depth Limiting**: Use `--level` flag to limit TOC depth (e.g., show only H1 and H2)
@@ -69,8 +71,14 @@ mdexplore -L 2 README.md
 # Show only top-level sections
 mdexplore --level 1 README.md
 
+# Pre-select a section by number (jumps directly to content)
+mdexplore README.md --select 1.1
+
 # Non-TTY mode (pipe to other tools)
 mdexplore README.md > toc.txt
+
+# Print only specific section and subsections (with --select in non-TTY mode)
+mdexplore README.md --select 1.3
 
 # Show help
 mdexplore --help
@@ -98,14 +106,14 @@ When the TUI is open:
 ```
 📄 README.md - Table of Contents
 
-  L1-4      ▶ Introduction
-  L5-8      ├── Installation
-  L9-14     │   └── Requirements
-  L15-18    │   └── Setup
-  L19-20    ├── Usage
-  L21-24    │   └── Basic Commands
-  L25-28    │   └── Advanced Options
-  L29-31    └── License
+  1.     L1-4      ▶ Introduction
+  1.1.   L5-8      ├── Installation
+  1.1.1. L9-14     │   └── Requirements
+  1.1.2. L15-18    │   └── Setup
+  1.2.   L19-20    ├── Usage
+  1.2.1. L21-24    │   └── Basic Commands
+  1.2.2. L25-28    │   └── Advanced Options
+  1.3.   L29-31    └── License
 
 [↑/↓] Navigate  [→] Expand  [←] Collapse  [Enter] View  [q] Quit
 ```
@@ -127,6 +135,7 @@ When the TUI is open:
 | Flag | Shorthand | Description |
 |------|-----------|-------------|
 | `--level N` | `-L N` | Maximum heading level to display (0 = no limit) |
+| `--select N` | | Pre-select section by number (e.g., 1.1) |
 | `--toc` | | Display table of contents (default: true) |
 | `--help` | `-h` | Display help information |
 | `--version` | `-v` | Display version information |

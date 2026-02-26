@@ -34,7 +34,7 @@ go.work.sum
 Thumbs.db
 
 # Project specific
-mdexplore
+/mdexplore
 bin/
 dist/
 build/

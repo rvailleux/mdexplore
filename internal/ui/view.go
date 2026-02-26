@@ -27,12 +27,12 @@ var (
 	treeStyle = lipgloss.NewStyle().
 		Foreground(lipgloss.Color("#888888"))
 
+	numberStyle = lipgloss.NewStyle().
+		Foreground(lipgloss.Color("#FF9F1C")).
+		Bold(true)
+
 	lineNumberStyle = lipgloss.NewStyle().
 		Foreground(lipgloss.Color("#666666"))
-
-	selectedLineNumberStyle = lipgloss.NewStyle().
-		Foreground(lipgloss.Color("#888888")).
-		Background(lipgloss.Color("#2D2D2D"))
 
 	errorStyle = lipgloss.NewStyle().
 		Bold(true).
@@ -128,9 +128,17 @@ func (m Model) renderTOC() string {
 	// Get visible sections
 	visibleSections := m.GetVisibleSections()
 
+	// Get numbered sections for display
+	numberedSections := m.Tree.AssignNumbers()
+	sectionToNumber := make(map[string]*models.NumberedSection)
+	for _, ns := range numberedSections {
+		sectionToNumber[ns.Section.ID] = ns
+	}
+
 	// TOC items
 	for i, section := range visibleSections {
-		line := renderSection(section, i, m.Selected, m.IsExpanded(section.ID))
+		ns := sectionToNumber[section.ID]
+		line := renderSectionWithNumber(section, ns, i, m.Selected, m.IsExpanded(section.ID))
 		if i == m.Selected {
 			b.WriteString(selectedStyle.Render(line))
 		} else {
@@ -208,9 +216,14 @@ func extractSectionFromFile(filepath string, startLine, endLine int) (string, er
 	return strings.Join(sectionLines, "\n"), nil
 }
 
-// renderSection renders a single section with line numbers and tree characters.
-func renderSection(section *models.Section, index, selected int, isExpanded bool) string {
+// renderSectionWithNumber renders a single section with section number, line numbers and tree characters.
+func renderSectionWithNumber(section *models.Section, ns *models.NumberedSection, index, selected int, isExpanded bool) string {
 	var b strings.Builder
+
+	// Section number (e.g., "1.1.")
+	if ns != nil {
+		b.WriteString(numberStyle.Render(fmt.Sprintf("%-6s ", ns.DisplayNumber)))
+	}
 
 	// Line numbers in format "L[start]-[end]"
 	lineNum := fmt.Sprintf("L%d-%d", section.StartLine, section.EndLine)

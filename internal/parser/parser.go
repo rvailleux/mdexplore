@@ -142,7 +142,7 @@ func (p *GoldmarkParser) Parse(filepath string) (models.TableOfContents, error) 
 	var headings []models.Heading
 	var inCodeBlock bool
 
-	ast.Walk(doc, func(n ast.Node, entering bool) (ast.WalkStatus, error) {
+	_ = ast.Walk(doc, func(n ast.Node, entering bool) (ast.WalkStatus, error) {
 		if entering {
 			switch n.Kind() {
 			case ast.KindFencedCodeBlock, ast.KindCodeBlock:
@@ -252,7 +252,7 @@ func (p *GoldmarkParser) ParseSectionTree(filepath string) (*models.SectionTree,
 	var sections []*models.Section
 	var inCodeBlock bool
 
-	ast.Walk(doc, func(n ast.Node, entering bool) (ast.WalkStatus, error) {
+	_ = ast.Walk(doc, func(n ast.Node, entering bool) (ast.WalkStatus, error) {
 		if entering {
 			switch n.Kind() {
 			case ast.KindFencedCodeBlock, ast.KindCodeBlock:
