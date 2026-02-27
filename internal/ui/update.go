@@ -34,44 +34,76 @@ func (m Model) handleKeyPress(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 
 	// Handle content view mode separately
 	if m.ViewMode == ViewContent {
-		switch msg.String() {
-		case "esc", "left", "h":
-			// Return to TOC view
-			m.ViewMode = ViewTOC
-			m.CurrentSection = nil
-			m.Selected = m.ReturnIndex
-		case "q", "ctrl+c":
-			m.Quitting = true
-			return m, tea.Quit
-		case "up", "k":
-			// Scroll up by one line
+		return m.handleContentViewKeys(msg)
+	}
+
+	// Handle TOC view mode
+	return m.handleTOCViewKeys(msg)
+}
+
+// handleContentViewKeys handles keys when in content view mode.
+func (m Model) handleContentViewKeys(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
+	keyStr := msg.String()
+
+	// Handle navigation and quit keys by string
+	switch keyStr {
+	case "esc", "left", "h":
+		// Return to TOC view
+		m.ViewMode = ViewTOC
+		m.CurrentSection = nil
+		m.Selected = m.ReturnIndex
+		return m, nil
+	case "q", "ctrl+c":
+		m.Quitting = true
+		return m, tea.Quit
+	}
+
+	// Handle scroll keys by key type (for arrow keys, page keys, home/end)
+	switch msg.Type {
+	case tea.KeyUp:
+		if m.ContentScrollOffset > 0 {
+			m.ContentScrollOffset--
+		}
+	case tea.KeyDown:
+		maxOffset := CalculateMaxOffset(m.ContentTotalLines, m.ViewportHeight)
+		if m.ContentScrollOffset < maxOffset {
+			m.ContentScrollOffset++
+		}
+	case tea.KeyPgUp:
+		m.ContentScrollOffset = max(0, m.ContentScrollOffset-m.ViewportHeight)
+	case tea.KeyPgDown:
+		maxOffset := CalculateMaxOffset(m.ContentTotalLines, m.ViewportHeight)
+		m.ContentScrollOffset = min(maxOffset, m.ContentScrollOffset+m.ViewportHeight)
+	case tea.KeyHome:
+		m.ContentScrollOffset = 0
+	case tea.KeyEnd:
+		m.ContentScrollOffset = CalculateMaxOffset(m.ContentTotalLines, m.ViewportHeight)
+	}
+
+	// Handle vim-style navigation with rune keys
+	if msg.Type == tea.KeyRunes && len(msg.Runes) == 1 {
+		switch msg.Runes[0] {
+		case 'k':
 			if m.ContentScrollOffset > 0 {
 				m.ContentScrollOffset--
 			}
-		case "down", "j":
-			// Scroll down by one line
+		case 'j':
 			maxOffset := CalculateMaxOffset(m.ContentTotalLines, m.ViewportHeight)
 			if m.ContentScrollOffset < maxOffset {
 				m.ContentScrollOffset++
 			}
-		case "pgup":
-			// Page up - scroll by viewport height
-			m.ContentScrollOffset = max(0, m.ContentScrollOffset-m.ViewportHeight)
-		case "pgdown":
-			// Page down - scroll by viewport height
-			maxOffset := CalculateMaxOffset(m.ContentTotalLines, m.ViewportHeight)
-			m.ContentScrollOffset = min(maxOffset, m.ContentScrollOffset+m.ViewportHeight)
-		case "home", "g":
-			// Jump to top
+		case 'g':
 			m.ContentScrollOffset = 0
-		case "end", "G":
-			// Jump to bottom
+		case 'G':
 			m.ContentScrollOffset = CalculateMaxOffset(m.ContentTotalLines, m.ViewportHeight)
 		}
-		return m, nil
 	}
 
-	// Handle TOC view mode
+	return m, nil
+}
+
+// handleTOCViewKeys handles keys when in TOC view mode.
+func (m Model) handleTOCViewKeys(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	switch msg.String() {
 	case "q", "ctrl+c":
 		m.Quitting = true
